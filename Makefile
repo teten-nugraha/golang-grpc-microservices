@@ -15,6 +15,9 @@ CHECKOUT_DEPLOYMENT=checkout-service/checkout-deployment.yaml
 NGINX_DEPLOYMENT=nginx/nginx-deployment.yaml
 ENVOY_DEPLOYMENT=envoy/envoy-deployment.yaml
 
+apply-ns:
+	kubectl create ns golang-micro
+
 # Build Docker images
 build: build-user build-product build-checkout
 
