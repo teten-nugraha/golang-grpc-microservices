@@ -1,0 +1,35 @@
+docker build -t user-service:latest -f Dockerfile .
+docker build -t product-service:latest -f Dockerfile .
+docker build -t checkout-service:latest -f Dockerfile .
+
+kubectl apply -f user-deployment.yaml
+kubectl apply -f product-deployment.yaml
+kubectl apply -f checkout-deployment.yaml
+
+kubectl apply -f nginx-deployment.yaml
+
+
+6. Akses Service dari Postman
+
+    Aktifkan Ingress di Minikube untuk akses eksternal:
+
+    bash
+
+minikube tunnel
+
+Temukan Alamat IP dari Nginx dengan perintah:
+
+bash
+
+    kubectl get service grpc-nginx
+
+    Konfigurasi Postman untuk gRPC:
+        Pilih gRPC Request di Postman.
+        Masukkan alamat grpc-nginx dan port 8080.
+        Pilih service yang diinginkan (UserService, ProductService, atau CheckoutService) dan metode RPC (misalnya, GetUser, GetProduct, atau CreateOrder).
+        Klik Send untuk mengirim permintaan gRPC ke server melalui Nginx.
+
+Ini akan mengirimkan request ke Nginx yang meneruskannya ke microservices Anda di Minikube.
+
+
+kubectl delete all --all

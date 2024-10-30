@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+option go_package = "protobuf/compiled";
+
+service UserService {
+  rpc GetUser (UserRequest) returns (UserResponse);
+}
+
+message UserRequest {
+  int32 user_id = 1;
+}
+
+message UserResponse {
+  int32 user_id = 1;
+  string name = 2;
+}

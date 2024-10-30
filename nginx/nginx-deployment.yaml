@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grpc-nginx
+  namespace: golang-micro
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grpc-nginx
+  template:
+    metadata:
+      labels:
+        app: grpc-nginx
+    spec:
+      containers:
+        - name: grpc-nginx
+          image: nginx:latest
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: nginx-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  namespace: golang-micro
+data:
+  nginx.conf: |
+    events {}
+
+    http {
+      
+      # Menambahkan resolver untuk DNS Kubernetes
+      resolver 10.96.0.10 valid=5s;
+    
+      upstream grpc_backend {
+        server user-service.golang-micro.svc.cluster.local:50051;
+        server product-service.golang-micro.svc.cluster.local:50052;
+        server checkout-service.golang-micro.svc.cluster.local:50053;
+      }
+
+      server {
+        listen 8080 http2;
+
+        location / {
+          grpc_pass grpc://grpc_backend;
+          grpc_set_header Host $host;
+        }
+      }
+    }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grpc-nginx
+  namespace: golang-micro
+spec:
+  type: LoadBalancer  # Gunakan LoadBalancer agar mendapatkan IP eksternal
+  selector:
+    app: grpc-nginx
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080

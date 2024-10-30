@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option go_package = "protobuf/compiled";
+
+service ProductService {
+  rpc GetProduct (ProductRequest) returns (ProductResponse);
+}
+
+message ProductRequest {
+  int32 product_id = 1;
+}
+
+message ProductResponse {
+  int32 product_id = 1;
+  string name = 2;
+  float price = 3;
+}
